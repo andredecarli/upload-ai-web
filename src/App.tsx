@@ -38,13 +38,14 @@ export function App() {
               readOnly
             />
           </div>
-
-          <p className="text-sm text-muted-foreground">
-            Lembre-se: Você  pode utilizar a variável <code>{'{transcription}'}</code> no seu prompt para adicionar o conteúdo da transcrição do vídeo selecionado.
-          </p>
+          <footer>
+            <p className="text-sm text-muted-foreground">
+              Lembre-se: Você  pode utilizar a variável <code>{'{transcription}'}</code> no seu prompt para adicionar o conteúdo da transcrição do vídeo selecionado.
+            </p>
+          </footer>
         </div>
-        <aside className="w-80 space-y-6">
-          <form className="space-y-6">
+        <aside className="w-80 space-y-5">
+          <form className="space-y-4">
             <label 
               htmlFor="video"
               className="border flex rounded-md aspect-video cursor-pointer border-dashed text-sm flex-col gap-2 justify-center items-center text-muted-foreground hover:bg-primary/10"
@@ -71,8 +72,8 @@ export function App() {
 
           <Separator />
 
-          <form className="space-y-6">
-            <div className="space-y-4">
+          <form className="space-y-4">
+            <div className="space-y-2">
               <Label>Prompt</Label>
               <Select>
                 <SelectTrigger>
@@ -88,7 +89,7 @@ export function App() {
               </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               <Label>Modelo</Label>
               <Select disabled defaultValue="gpt3.5">
                 <SelectTrigger>
@@ -105,7 +106,7 @@ export function App() {
 
             <Separator />
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               <Label>Temperatura</Label>
               <Slider 
                 min={0}
