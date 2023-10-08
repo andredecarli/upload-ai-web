@@ -13,7 +13,7 @@ import { encodeMessage } from "@/utils/encrypt";
 type Status = 'selecting' | 'waiting' | 'converting' | 'uploading' | 'generating' | 'success' | 'error'
 
 const statusMessages = {
-  selecting: 'Carregar Vídeo',
+  selecting: 'Selecione um Vídeo/Áudio',
   converting: 'Convertendo...',
   generating: 'Transcrevendo...',
   uploading: 'Carregando...',
@@ -95,9 +95,14 @@ export function VideoInputForm(){
       return
     }
 
-    setStatus('converting')
+    let audioFile : File
+    if (videoFile.type === "video/mp4") {
+      setStatus('converting')
 
-    const audioFile = await convertVideoToAudio(videoFile)
+      audioFile = await convertVideoToAudio(videoFile)
+    } else {
+      audioFile = videoFile
+    }
 
     const data = new FormData()
 
@@ -163,11 +168,11 @@ export function VideoInputForm(){
         ) : (
           <>
             <FileVideo className="w-5 h-5"/>
-            Selecione um vídeo
+            Selecione um vídeo/áudio
           </>
         )}
       </label>
-      <input type="file" id="video" accept="video/mp4" className="sr-only" onChange={handleFileSelected} />
+      <input type="file" id="video" accept="video/mp4, audio/mpeg" className="sr-only" onChange={handleFileSelected} />
       <Separator />
       <div className="space-y-2">
         <Label htmlFor="transcription_prompt">Prompt de transcrição</Label>
@@ -189,7 +194,7 @@ export function VideoInputForm(){
       >
         {status === 'waiting' ? (
           <>
-            Carregar Vídeo
+            Carregar Arquivo
             <Upload className="w-4 h-4 ml-2" />
           </>
         ) : statusMessages[status]}
