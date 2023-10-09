@@ -7,8 +7,6 @@ import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
 import { getFFmpeg } from "@/lib/ffmpeg";
 import { fetchFile } from "@ffmpeg/util"
 import { api } from "@/lib/axios";
-import { Input } from "./ui/input";
-import { encodeMessage } from "@/utils/encrypt";
 
 type Status = 'selecting' | 'waiting' | 'converting' | 'uploading' | 'generating' | 'success' | 'error'
 
@@ -21,14 +19,16 @@ const statusMessages = {
   error: 'Ocorreu um erro!',
 }
 
-export function VideoInputForm(){
-  // const { apiKey, setApiKey } = useContext(ApiContext)
+interface VideoInputFormProps {
+  onVideoUploaded: (id: string) => void
+}
+
+export function VideoInputForm(props: VideoInputFormProps){
 
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>('selecting')
 
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
-  const apiKeyInputRef = useRef<HTMLInputElement>(null)
 
   function handleFileSelected(event: ChangeEvent<HTMLInputElement>) {
     const { files } = event.currentTarget
@@ -84,14 +84,9 @@ export function VideoInputForm(){
   async function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const apiKey = apiKeyInputRef.current?.value
     const prompt = promptInputRef.current?.value
 
     if(!videoFile) {
-      return
-    }
-
-    if (!apiKey) {
       return
     }
 
@@ -121,22 +116,8 @@ export function VideoInputForm(){
 
     setStatus('generating')
 
-    response = await api.post('encryption/exchange')
-
-    if (response.status !== 200) {
-      setStatus('error')
-      return
-    }
-
-    const receiverPublicKey = response.data.receiverPublicKey
-
-    const {encryptedMessage, ephemPubKey, nonce} = encodeMessage(receiverPublicKey, apiKey)
-
     try {
       await api.post(`/videos/${videoId}/transcription`, {
-        encryptedApiKey: encryptedMessage,
-        ephemPubKey,
-        nonce,
         prompt,
       })
   
@@ -144,6 +125,8 @@ export function VideoInputForm(){
     } catch (err) {
       setStatus('error')
     }
+
+    props.onVideoUploaded(videoId)
   }
 
   const previewURL = useMemo(() => {
@@ -156,9 +139,6 @@ export function VideoInputForm(){
 
   return (
     <form onSubmit={handleUploadVideo} className="space-y-4">
-      <Label>Chave da OpenAI</Label>
-      <Input id="api_key" type="text" ref={apiKeyInputRef} placeholder="Cole aqui sua OpenAI API Key" required />
-      {/* <Input type="text" placeholder="Cole aqui sua OpenAI API Key" required value={apiKey} onChange={e => setApiKey(e.target.value)}/> */}
       <label  
         htmlFor="video"
         className="relative border flex rounded-md aspect-video cursor-pointer border-dashed text-sm flex-col gap-2 justify-center items-center text-muted-foreground hover:bg-primary/10"

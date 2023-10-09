@@ -8,13 +8,29 @@ import { PromptSelect } from "./components/prompt-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Slider } from "./components/ui/slider";
 import { useState } from "react";
+import { useCompletion } from 'ai/react'
 
 export function App() {
   const [temperature, setTemperature] = useState(0.5)
+  const [videoId, setVideoId] = useState<string | null>(null)
 
-  function handlePromptSelected(template: string) {
-    console.log(template)
-  }
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    completion,
+    isLoading,
+  } = useCompletion({
+    api: 'http://localhost:3333/ai/complete',
+    body: {
+      videoId,
+      temperature,
+    },
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  })
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -40,11 +56,14 @@ export function App() {
             <Textarea 
               className="resize-none p-3 leading-relaxed"
               placeholder="Inclua o prompt para a IA" 
+              value={input}
+              onChange={handleInputChange}
             />
             <Textarea 
               className="resize-none p-3 leading-relaxed"
               placeholder="Resultado gerado pela IA..."
               readOnly
+              value={completion}
             />
           </div>
           <footer>
@@ -54,12 +73,14 @@ export function App() {
           </footer>
         </div>
         <aside className="w-80 space-y-5">
-          <VideoInputForm />
+          <VideoInputForm onVideoUploaded={setVideoId} />
+
           <Separator />
-          <form className="space-y-4">
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Prompt</Label>
-              <PromptSelect onPromptSelected={handlePromptSelected} />
+              <PromptSelect onPromptSelected={setInput} />
               <span className="block text-xs text-muted-foreground italic">
                 Você poderá customizar essa opção em breve
               </span>
@@ -98,7 +119,7 @@ export function App() {
 
             <Separator />
 
-            <Button type="submit" className="w-full">
+            <Button disabled={isLoading} type="submit" className="w-full">
               Executar
               <Wand2 className="w-4 h-4 ml-2"/>
             </Button>
