@@ -43,11 +43,12 @@ export function App() {
           </span>
 
           <Separator orientation="vertical" className="h-6" />
-
-          <Button variant="destructive">
-           <Github className="w-4 h-4 mr-2"></Github>
-           Github
-          </Button>
+          <a href="https://github.com/andredecarli/upload-ai-web" target="_blank">
+            <Button variant="destructive">
+            <Github className="w-4 h-4 mr-2"></Github>
+            Github
+            </Button>
+          </a>
         </div>
       </header>
       <main className="flex-1 p-6 flex gap-6">
